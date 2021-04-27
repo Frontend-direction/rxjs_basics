@@ -7,10 +7,24 @@ const observer = {
 };
 
 const observable = new Observable(subscriber => {
-  subscriber.next('hello');
-  subscriber.next('Vova');
-  subscriber.complete();
-  subscriber.next('After');
+  let count = 0;
+  const id = setInterval(() => {
+    subscriber.next(count);
+    count = count + 1;
+  }, 1000);
+
+  return () => {
+    console.log('called');
+    clearInterval(id);
+  }
 })
 
-observable.subscribe(observer);
+console.log('before');
+const subscription = observable.subscribe(observer);
+const subscription2 = observable.subscribe(observer);
+console.log('after');
+subscription.add(subscription2);
+
+setTimeout(() => {
+  subscription.unsubscribe();
+}, 3500)
